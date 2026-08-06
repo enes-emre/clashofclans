@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Düzen Paylaş</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="feed-body">
+
+  <header class="site-nav">
+    <a href="duzenler.html" class="brand">Üs Arşivi</a>
+    <div class="nav-actions">
+      <a href="duzenler.html" class="btn-logout">← Geri dön</a>
+    </div>
+  </header>
+
+  <main class="share-main">
+    <div class="share-card">
+      <h1 class="auth-title">Düzen Paylaş</h1>
+      <p class="share-hint">Bir ekran görüntüsü ve düzen linki yeterli.</p>
+
+      <form id="shareForm" class="auth-form">
+        <label for="baseImage">Düzen fotoğrafı</label>
+        <input type="file" id="baseImage" accept="image/*" required />
+        <img id="imagePreview" class="image-preview hidden" alt="Önizleme" />
+
+        <label for="baseLink">Düzen linki</label>
+        <input type="url" id="baseLink" placeholder="https://link.clashofclans.com/..." required />
+
+        <p class="status-msg" id="statusMsg"></p>
+
+        <button type="submit" class="primary-btn" id="shareSubmitBtn">Paylaş</button>
+      </form>
+    </div>
+  </main>
+
+  <script type="module" src="share.js"></script>
+</body>
+</html>

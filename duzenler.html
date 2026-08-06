@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Üs Arşivi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="feed-body">
+
+  <header class="site-nav">
+    <div class="brand">Üs Arşivi</div>
+
+    <form class="search-form" id="searchForm">
+      <input type="text" id="searchInput" placeholder="Kullanıcı adına göre ara..." />
+      <button type="submit" aria-label="Ara">Ara</button>
+    </form>
+
+    <div class="nav-actions">
+      <a href="paylas.html" class="btn-share">+ Düzen Paylaş</a>
+      <button id="logoutBtn" class="btn-logout" type="button">Çıkış</button>
+    </div>
+  </header>
+
+  <main class="feed-main">
+    <section class="grid" id="basesGrid">
+      <p class="grid-status">Yükleniyor...</p>
+    </section>
+
+    <nav class="pagination" id="pagination" aria-label="Sayfalar"></nav>
+  </main>
+
+  <script type="module" src="feed.js"></script>
+</body>
+</html>

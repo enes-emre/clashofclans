@@ -1,0 +1,499 @@
+/* ---------- Tema değişkenleri ---------- */
+:root {
+  --bg: #f4f8fd;
+  --card-bg: #ffffff;
+  --border: #dbe6f5;
+  --text: #16233a;
+  --text-muted: #64748b;
+  --accent: #1c4e91;       /* koyu kraliyet mavisi */
+  --accent-hover: #123a70;
+  --accent-soft: #e8f0fc;
+  --gold: #e3a13c;         /* yıldız / puan rengi */
+  --error: #c04f3a;
+  --radius: 10px;
+  --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: "Barlow Condensed", var(--font);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  font-family: var(--font);
+  color: var(--text);
+  padding: 24px;
+}
+
+/* ---------- Kart ---------- */
+.auth-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.auth-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0 0 20px;
+  text-align: center;
+  color: var(--text);
+}
+
+/* ---------- Sekmeler ---------- */
+.tabs {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.tab-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ---------- Durum mesajı ---------- */
+.status-msg {
+  min-height: 18px;
+  font-size: 13px;
+  text-align: center;
+  margin: 0 0 12px;
+  color: var(--error);
+}
+
+.status-msg.success {
+  color: var(--accent);
+}
+
+/* ---------- Form ---------- */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-form.hidden {
+  display: none;
+}
+
+.auth-form label {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 10px;
+}
+
+.auth-form input[type="text"],
+.auth-form input[type="password"] {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.auth-form input[type="text"]:focus,
+.auth-form input[type="password"]:focus {
+  border-color: var(--accent);
+}
+
+.checkbox-row {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.checkbox-row input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* ---------- Buton ---------- */
+.primary-btn {
+  margin-top: 20px;
+  padding: 11px 0;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.primary-btn:hover {
+  background: var(--accent-hover);
+}
+
+.primary-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ---------- Erişilebilirlik ---------- */
+input:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+/* ============================================================
+   ÜS ARŞİVİ — ana sayfa, paylaşım sayfası ortak stilleri
+   ============================================================ */
+
+.feed-body {
+  display: block;
+  min-height: 100vh;
+  padding: 0;
+  align-items: initial;
+  justify-content: initial;
+}
+
+/* ---------- Üst gezinme ---------- */
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 28px;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.3px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.search-form {
+  flex: 1;
+  display: flex;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.search-form input {
+  flex: 1;
+  padding: 9px 14px;
+  border: 1px solid var(--border);
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+}
+
+.search-form input:focus {
+  border-color: var(--accent);
+}
+
+.search-form button {
+  padding: 0 16px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  border-radius: 0 8px 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.search-form button:hover {
+  background: var(--accent-hover);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.btn-share {
+  padding: 9px 16px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.btn-share:hover {
+  background: var(--accent-hover);
+}
+
+.btn-logout {
+  padding: 9px 14px;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn-logout:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ---------- Grid: 2 sütun x 5 satır ---------- */
+.feed-main {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 28px 20px 60px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.grid-status {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 40px 0;
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .site-nav {
+    flex-wrap: wrap;
+    padding: 12px 16px;
+  }
+  .search-form {
+    order: 3;
+    max-width: none;
+    width: 100%;
+  }
+}
+
+/* ---------- Düzen kartı ---------- */
+.base-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.base-card:hover {
+  box-shadow: 0 4px 16px rgba(28, 78, 145, 0.1);
+  transform: translateY(-2px);
+}
+
+.base-image-wrap {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: var(--accent-soft);
+}
+
+.base-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.rating-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(22, 35, 58, 0.85);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 999px;
+  backdrop-filter: blur(2px);
+}
+
+.base-link {
+  display: block;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border);
+  background: var(--accent-soft);
+}
+
+.base-link:hover {
+  text-decoration: underline;
+}
+
+.base-meta {
+  padding: 10px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.base-user {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.base-user small {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.star-input {
+  display: flex;
+  gap: 2px;
+}
+
+.star-input .star {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--border);
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.1s ease;
+}
+
+.star-input .star.filled,
+.star-input .star:hover,
+.star-input .star:hover ~ .star {
+  color: var(--gold);
+}
+
+/* ---------- Sayfalama ---------- */
+.pagination {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 32px;
+}
+
+.pagination button {
+  min-width: 36px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pagination button:not(:disabled):not(.active):hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ---------- Paylaşım sayfası ---------- */
+.share-main {
+  display: flex;
+  justify-content: center;
+  padding: 48px 20px;
+}
+
+.share-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+}
+
+.share-hint {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: -10px 0 18px;
+}
+
+.image-preview {
+  margin-top: 10px;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.image-preview.hidden {
+  display: none;
+}

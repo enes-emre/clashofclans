@@ -4,12 +4,17 @@ const PAGE_SIZE = 10; // 5 satır x 2 sütun
 
 let currentPage = 1;
 let currentSearch = "";
+let currentView = "all"; // "all" | "saved"
 
 const grid = document.getElementById("basesGrid");
 const paginationEl = document.getElementById("pagination");
 const searchForm = document.getElementById("searchForm");
 const searchInput = document.getElementById("searchInput");
 const logoutBtn = document.getElementById("logoutBtn");
+const tabAll = document.getElementById("tabAll");
+const tabSaved = document.getElementById("tabSaved");
+
+let currentSession = null;
 
 // ------------------------------------------------------------
 // Giriş kontrolü — oturum yoksa login sayfasına gönder
@@ -19,6 +24,7 @@ async function requireAuth() {
   if (!session) {
     window.location.href = "index.html";
   }
+  currentSession = session;
   return session;
 }
 
@@ -27,9 +33,26 @@ async function requireAuth() {
 // ------------------------------------------------------------
 async function loadBases() {
   grid.innerHTML = `<p class="grid-status">Yükleniyor...</p>`;
+  paginationEl.innerHTML = "";
 
   const from = (currentPage - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
+
+  // "Kaydedilenler" görünümündeysek önce kaydedilen düzen id'lerini alıyoruz
+  let savedBaseIds = null;
+  if (currentView === "saved") {
+    const { data: savedRows } = await supabase
+      .from("saved_bases")
+      .select("base_id")
+      .eq("user_id", currentSession.user.id);
+
+    savedBaseIds = (savedRows || []).map((r) => r.base_id);
+
+    if (savedBaseIds.length === 0) {
+      grid.innerHTML = `<p class="grid-status">Henüz hiç düzen kaydetmedin.</p>`;
+      return;
+    }
+  }
 
   let query = supabase
     .from("bases")
@@ -39,6 +62,10 @@ async function loadBases() {
 
   if (currentSearch) {
     query = query.ilike("profiles.username", `%${currentSearch}%`);
+  }
+
+  if (savedBaseIds) {
+    query = query.in("id", savedBaseIds);
   }
 
   const { data: bases, count, error } = await query;
@@ -51,17 +78,17 @@ async function loadBases() {
 
   if (!bases || bases.length === 0) {
     grid.innerHTML = `<p class="grid-status">Hiç düzen bulunamadı.</p>`;
-    paginationEl.innerHTML = "";
     return;
   }
 
   const baseIds = bases.map((b) => b.id);
   const userIds = [...new Set(bases.map((b) => b.profiles.id))];
 
-  const [ratingRes, countRes, myRatings] = await Promise.all([
+  const [ratingRes, countRes, myRatings, mySaved] = await Promise.all([
     supabase.from("base_ratings").select("base_id, avg_rating").in("base_id", baseIds),
     supabase.from("profile_stats").select("id, base_count").in("id", userIds),
     getMyRatings(baseIds),
+    getMySaved(baseIds),
   ]);
 
   const ratingMap = Object.fromEntries((ratingRes.data || []).map((r) => [r.base_id, r.avg_rating]));
@@ -70,7 +97,7 @@ async function loadBases() {
   grid.innerHTML = "";
   bases.forEach((base) => {
     grid.appendChild(
-      renderCard(base, ratingMap[base.id], countMap[base.profiles.id], myRatings[base.id])
+      renderCard(base, ratingMap[base.id], countMap[base.profiles.id], myRatings[base.id], mySaved.has(base.id))
     );
   });
 
@@ -78,20 +105,27 @@ async function loadBases() {
 }
 
 async function getMyRatings(baseIds) {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return {};
   const { data } = await supabase
     .from("ratings")
     .select("base_id, rating")
-    .eq("user_id", session.user.id)
+    .eq("user_id", currentSession.user.id)
     .in("base_id", baseIds);
   return Object.fromEntries((data || []).map((r) => [r.base_id, r.rating]));
+}
+
+async function getMySaved(baseIds) {
+  const { data } = await supabase
+    .from("saved_bases")
+    .select("base_id")
+    .eq("user_id", currentSession.user.id)
+    .in("base_id", baseIds);
+  return new Set((data || []).map((r) => r.base_id));
 }
 
 // ------------------------------------------------------------
 // Tek bir düzen kartı oluştur
 // ------------------------------------------------------------
-function renderCard(base, avgRating, baseCount, myRating) {
+function renderCard(base, avgRating, baseCount, myRating, isSaved) {
   const card = document.createElement("article");
   card.className = "base-card";
 
@@ -104,7 +138,12 @@ function renderCard(base, avgRating, baseCount, myRating) {
     </div>
     <a class="base-link" href="${base.link}" target="_blank" rel="noopener noreferrer">Düzeni Aç ↗</a>
     <div class="base-meta">
-      <span class="base-user">${escapeHtml(base.profiles.username)} <small>(${baseCount ?? 0} düzen)</small></span>
+      <div class="meta-top">
+        <span class="base-user">${escapeHtml(base.profiles.username)} <small>(${baseCount ?? 0} düzen)</small></span>
+        <button type="button" class="save-btn ${isSaved ? "saved" : ""}" data-base-id="${base.id}">
+          ${isSaved ? "🔖 Kaydedildi" : "🔖 Kaydet"}
+        </button>
+      </div>
       <div class="star-input" data-base-id="${base.id}">
         ${[1, 2, 3, 4, 5]
           .map(
@@ -120,6 +159,10 @@ function renderCard(base, avgRating, baseCount, myRating) {
     starBtn.addEventListener("click", () => submitRating(base.id, Number(starBtn.dataset.value)));
   });
 
+  card.querySelector(".save-btn").addEventListener("click", (e) => {
+    toggleSave(base.id, e.currentTarget);
+  });
+
   return card;
 }
 
@@ -133,16 +176,42 @@ function escapeHtml(str) {
 // Puan gönder (1-5)
 // ------------------------------------------------------------
 async function submitRating(baseId, value) {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) {
-    window.location.href = "index.html";
-    return;
-  }
   await supabase.from("ratings").upsert(
-    { base_id: baseId, user_id: session.user.id, rating: value },
+    { base_id: baseId, user_id: currentSession.user.id, rating: value },
     { onConflict: "base_id,user_id" }
   );
   loadBases();
+}
+
+// ------------------------------------------------------------
+// Kaydet / kaydı kaldır
+// ------------------------------------------------------------
+async function toggleSave(baseId, btn) {
+  const isSaved = btn.classList.contains("saved");
+
+  btn.disabled = true;
+
+  if (isSaved) {
+    await supabase
+      .from("saved_bases")
+      .delete()
+      .eq("base_id", baseId)
+      .eq("user_id", currentSession.user.id);
+  } else {
+    await supabase
+      .from("saved_bases")
+      .insert({ base_id: baseId, user_id: currentSession.user.id });
+  }
+
+  btn.disabled = false;
+
+  if (currentView === "saved") {
+    // Kaydedilenler görünümündeyken kaydı kaldırınca kart listeden düşmeli
+    loadBases();
+  } else {
+    btn.classList.toggle("saved");
+    btn.textContent = btn.classList.contains("saved") ? "🔖 Kaydedildi" : "🔖 Kaydet";
+  }
 }
 
 // ------------------------------------------------------------
@@ -180,6 +249,27 @@ function goToPage(page) {
   loadBases();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
+
+// ------------------------------------------------------------
+// Görünüm sekmeleri (Tüm Düzenler / Kaydedilenler)
+// ------------------------------------------------------------
+tabAll.addEventListener("click", () => {
+  if (currentView === "all") return;
+  currentView = "all";
+  currentPage = 1;
+  tabAll.classList.add("active");
+  tabSaved.classList.remove("active");
+  loadBases();
+});
+
+tabSaved.addEventListener("click", () => {
+  if (currentView === "saved") return;
+  currentView = "saved";
+  currentPage = 1;
+  tabSaved.classList.add("active");
+  tabAll.classList.remove("active");
+  loadBases();
+});
 
 // ------------------------------------------------------------
 // Arama

@@ -5,6 +5,17 @@ const statusMsg = document.getElementById("statusMsg");
 const submitBtn = document.getElementById("shareSubmitBtn");
 const fileInput = document.getElementById("baseImage");
 const previewImg = document.getElementById("imagePreview");
+const thButtons = document.querySelectorAll(".th-btn");
+
+let selectedTownHall = 17;
+
+thButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    thButtons.forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    selectedTownHall = Number(btn.dataset.th);
+  });
+});
 
 function showStatus(message, type = "error") {
   statusMsg.textContent = message;
@@ -67,6 +78,7 @@ form.addEventListener("submit", async (e) => {
     user_id: session.user.id,
     image_url: publicUrlData.publicUrl,
     link,
+    town_hall: selectedTownHall,
   });
 
   submitBtn.disabled = false;

@@ -4,7 +4,7 @@ const PAGE_SIZE = 10; // 5 satır x 2 sütun
 
 let currentPage = 1;
 let currentSearch = "";
-let currentView = "all"; // "all" | "saved"
+let currentView = "all"; // "all" | "saved" | "th17" | "th18"
 
 const grid = document.getElementById("basesGrid");
 const paginationEl = document.getElementById("pagination");
@@ -12,7 +12,10 @@ const searchForm = document.getElementById("searchForm");
 const searchInput = document.getElementById("searchInput");
 const logoutBtn = document.getElementById("logoutBtn");
 const tabAll = document.getElementById("tabAll");
+const tabTh18 = document.getElementById("tabTh18");
+const tabTh17 = document.getElementById("tabTh17");
 const tabSaved = document.getElementById("tabSaved");
+const allTabs = [tabAll, tabTh18, tabTh17, tabSaved];
 
 let currentSession = null;
 
@@ -56,12 +59,16 @@ async function loadBases() {
 
   let query = supabase
     .from("bases")
-    .select("id, image_url, link, created_at, profiles!inner(id, username)", { count: "exact" })
+    .select("id, image_url, link, town_hall, created_at, profiles!inner(id, username)", { count: "exact" })
     .order("created_at", { ascending: false })
     .range(from, to);
 
   if (currentSearch) {
     query = query.ilike("profiles.username", `%${currentSearch}%`);
+  }
+
+  if (currentView === "th17" || currentView === "th18") {
+    query = query.eq("town_hall", currentView === "th17" ? 17 : 18);
   }
 
   if (savedBaseIds) {
@@ -134,6 +141,7 @@ function renderCard(base, avgRating, baseCount, myRating, isSaved) {
   card.innerHTML = `
     <div class="base-image-wrap">
       <img src="${base.image_url}" alt="${escapeHtml(base.profiles.username)} kullanıcısının düzeni" loading="lazy" />
+      <span class="th-badge">TH${base.town_hall}</span>
       <span class="rating-badge">⭐ ${ratingText}</span>
     </div>
     <a class="base-link" href="${base.link}" target="_blank" rel="noopener noreferrer">Düzeni Aç ↗</a>
@@ -253,23 +261,22 @@ function goToPage(page) {
 // ------------------------------------------------------------
 // Görünüm sekmeleri (Tüm Düzenler / Kaydedilenler)
 // ------------------------------------------------------------
-tabAll.addEventListener("click", () => {
-  if (currentView === "all") return;
-  currentView = "all";
+// ------------------------------------------------------------
+// Görünüm sekmeleri (Tüm Düzenler / TH18 / TH17 / Kaydedilenler)
+// ------------------------------------------------------------
+function setView(view, activeTab) {
+  if (currentView === view) return;
+  currentView = view;
   currentPage = 1;
-  tabAll.classList.add("active");
-  tabSaved.classList.remove("active");
+  allTabs.forEach((t) => t.classList.remove("active"));
+  activeTab.classList.add("active");
   loadBases();
-});
+}
 
-tabSaved.addEventListener("click", () => {
-  if (currentView === "saved") return;
-  currentView = "saved";
-  currentPage = 1;
-  tabSaved.classList.add("active");
-  tabAll.classList.remove("active");
-  loadBases();
-});
+tabAll.addEventListener("click", () => setView("all", tabAll));
+tabTh18.addEventListener("click", () => setView("th18", tabTh18));
+tabTh17.addEventListener("click", () => setView("th17", tabTh17));
+tabSaved.addEventListener("click", () => setView("saved", tabSaved));
 
 // ------------------------------------------------------------
 // Arama

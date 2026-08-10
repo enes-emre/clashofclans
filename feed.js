@@ -5,30 +5,43 @@ const PAGE_SIZE = 10; // 5 satır x 2 sütun
 let currentPage = 1;
 let currentSearch = "";
 let currentView = "all"; // "all" | "saved" | "th17" | "th18"
+let currentSession = null; // giriş yapılmamışsa null kalır — gezinme buna izin verir
 
 const grid = document.getElementById("basesGrid");
 const paginationEl = document.getElementById("pagination");
 const searchForm = document.getElementById("searchForm");
 const searchInput = document.getElementById("searchInput");
 const logoutBtn = document.getElementById("logoutBtn");
+const shareBtn = document.getElementById("shareBtn");
+const loginBtn = document.getElementById("loginBtn");
 const tabAll = document.getElementById("tabAll");
 const tabTh18 = document.getElementById("tabTh18");
 const tabTh17 = document.getElementById("tabTh17");
 const tabSaved = document.getElementById("tabSaved");
 const allTabs = [tabAll, tabTh18, tabTh17, tabSaved];
 
-let currentSession = null;
-
 // ------------------------------------------------------------
-// Giriş kontrolü — oturum yoksa login sayfasına gönder
+// Giriş durumunu oku — YÖNLENDİRME YOK, sadece arayüzü ayarlıyoruz.
+// Site herkese açık; giriş sadece paylaşma/puanlama/kaydetme için gerekir.
 // ------------------------------------------------------------
-async function requireAuth() {
+async function loadSession() {
   const { data: { session } } = await supabase.auth.getSession();
-  if (!session) {
-    window.location.href = "index.html";
-  }
   currentSession = session;
-  return session;
+
+  if (session) {
+    shareBtn.classList.remove("hidden");
+    logoutBtn.classList.remove("hidden");
+    loginBtn.classList.add("hidden");
+  } else {
+    shareBtn.classList.add("hidden");
+    logoutBtn.classList.add("hidden");
+    loginBtn.classList.remove("hidden");
+  }
+}
+
+// Giriş isteyen bir eyleme tıklanınca çağrılır
+function goToLogin() {
+  window.location.href = "giris.html";
 }
 
 // ------------------------------------------------------------
@@ -38,10 +51,15 @@ async function loadBases() {
   grid.innerHTML = `<p class="grid-status">Yükleniyor...</p>`;
   paginationEl.innerHTML = "";
 
+  // Kaydedilenler sekmesi giriş ister
+  if (currentView === "saved" && !currentSession) {
+    goToLogin();
+    return;
+  }
+
   const from = (currentPage - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
 
-  // "Kaydedilenler" görünümündeysek önce kaydedilen düzen id'lerini alıyoruz
   let savedBaseIds = null;
   if (currentView === "saved") {
     const { data: savedRows } = await supabase
@@ -111,7 +129,9 @@ async function loadBases() {
   renderPagination(count || 0);
 }
 
+// Giriş yoksa boş döner — anonim ziyaretçi için puan/kayıt bilgisi olmaz
 async function getMyRatings(baseIds) {
+  if (!currentSession) return {};
   const { data } = await supabase
     .from("ratings")
     .select("base_id, rating")
@@ -121,6 +141,7 @@ async function getMyRatings(baseIds) {
 }
 
 async function getMySaved(baseIds) {
+  if (!currentSession) return new Set();
   const { data } = await supabase
     .from("saved_bases")
     .select("base_id")
@@ -181,9 +202,13 @@ function escapeHtml(str) {
 }
 
 // ------------------------------------------------------------
-// Puan gönder (1-5)
+// Puan gönder (1-5) — giriş gerektirir
 // ------------------------------------------------------------
 async function submitRating(baseId, value) {
+  if (!currentSession) {
+    goToLogin();
+    return;
+  }
   await supabase.from("ratings").upsert(
     { base_id: baseId, user_id: currentSession.user.id, rating: value },
     { onConflict: "base_id,user_id" }
@@ -192,11 +217,15 @@ async function submitRating(baseId, value) {
 }
 
 // ------------------------------------------------------------
-// Kaydet / kaydı kaldır
+// Kaydet / kaydı kaldır — giriş gerektirir
 // ------------------------------------------------------------
 async function toggleSave(baseId, btn) {
-  const isSaved = btn.classList.contains("saved");
+  if (!currentSession) {
+    goToLogin();
+    return;
+  }
 
+  const isSaved = btn.classList.contains("saved");
   btn.disabled = true;
 
   if (isSaved) {
@@ -214,7 +243,6 @@ async function toggleSave(baseId, btn) {
   btn.disabled = false;
 
   if (currentView === "saved") {
-    // Kaydedilenler görünümündeyken kaydı kaldırınca kart listeden düşmeli
     loadBases();
   } else {
     btn.classList.toggle("saved");
@@ -259,12 +287,13 @@ function goToPage(page) {
 }
 
 // ------------------------------------------------------------
-// Görünüm sekmeleri (Tüm Düzenler / Kaydedilenler)
-// ------------------------------------------------------------
-// ------------------------------------------------------------
 // Görünüm sekmeleri (Tüm Düzenler / TH18 / TH17 / Kaydedilenler)
 // ------------------------------------------------------------
 function setView(view, activeTab) {
+  if (view === "saved" && !currentSession) {
+    goToLogin();
+    return;
+  }
   if (currentView === view) return;
   currentView = view;
   currentPage = 1;
@@ -279,7 +308,7 @@ tabTh17.addEventListener("click", () => setView("th17", tabTh17));
 tabSaved.addEventListener("click", () => setView("saved", tabSaved));
 
 // ------------------------------------------------------------
-// Arama
+// Arama — giriş gerektirmez
 // ------------------------------------------------------------
 searchForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -293,13 +322,18 @@ searchForm.addEventListener("submit", (e) => {
 // ------------------------------------------------------------
 logoutBtn.addEventListener("click", async () => {
   await supabase.auth.signOut();
-  window.location.href = "index.html";
+  await loadSession();
+  if (currentView === "saved") {
+    tabAll.click();
+  } else {
+    loadBases();
+  }
 });
 
 // ------------------------------------------------------------
-// Başlat
+// Başlat — giriş şart değil, herkes doğrudan düzenleri görür
 // ------------------------------------------------------------
 (async function init() {
-  await requireAuth();
+  await loadSession();
   loadBases();
 })();

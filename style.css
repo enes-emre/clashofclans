@@ -578,6 +578,23 @@ a:focus-visible {
   display: none;
 }
 
+/* ---------- Genel gizleme yardımcı sınıfı ---------- */
+.hidden {
+  display: none !important;
+}
+
+/* ---------- Giriş sayfasında yönlendirme bilgilendirmesi ---------- */
+.redirect-notice {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  text-align: center;
+  margin: 0 0 18px;
+}
+
 /* ---------- Belediye binası seçimi (paylaşım formu) ---------- */
 .th-select {
   display: flex;

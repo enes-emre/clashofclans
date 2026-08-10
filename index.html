@@ -3,57 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Giriş Yap / Hesap Oluştur</title>
+  <title>Made in Turkey</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="feed-body">
 
-  <main class="auth-card">
-    <h1 class="auth-title">Hoş geldin</h1>
+  <header class="site-nav">
+    <div class="brand">Made in Turkey</div>
 
-    <!-- Sekmeler -->
-    <div class="tabs" role="tablist">
-      <button class="tab-btn active" id="tab-login" role="tab" aria-selected="true">Giriş Yap</button>
-      <button class="tab-btn" id="tab-register" role="tab" aria-selected="false">Hesap Oluştur</button>
+    <form class="search-form" id="searchForm">
+      <input type="text" id="searchInput" placeholder="Kullanıcı adına göre ara..." />
+      <button type="submit" aria-label="Ara">Ara</button>
+    </form>
+
+    <div class="nav-actions">
+      <a href="paylas.html" class="btn-share hidden" id="shareBtn">+ Düzen Paylaş</a>
+      <button id="logoutBtn" class="btn-logout hidden" type="button">Çıkış</button>
+      <a href="giris.html" class="btn-share hidden" id="loginBtn">Giriş Yap</a>
+    </div>
+  </header>
+
+  <main class="feed-main">
+    <div class="view-tabs">
+      <button type="button" class="view-tab active" id="tabAll">Tüm Düzenler</button>
+      <button type="button" class="view-tab" id="tabTh18" data-th="18">TH18</button>
+      <button type="button" class="view-tab" id="tabTh17" data-th="17">TH17</button>
+      <button type="button" class="view-tab" id="tabSaved">Kaydedilenler</button>
     </div>
 
-    <!-- Ortak durum mesajı (hata / başarı) -->
-    <p class="status-msg" id="statusMsg"></p>
+    <section class="grid" id="basesGrid">
+      <p class="grid-status">Yükleniyor...</p>
+    </section>
 
-    <!-- GİRİŞ YAP FORMU -->
-    <form id="loginForm" class="auth-form">
-      <label for="loginUsername">Kullanıcı adı</label>
-      <input type="text" id="loginUsername" autocomplete="username" required />
-
-      <label for="loginPassword">Şifre</label>
-      <input type="password" id="loginPassword" autocomplete="current-password" required />
-
-      <label class="checkbox-row">
-        <input type="checkbox" id="rememberMe" />
-        <span>Beni hatırla</span>
-      </label>
-
-      <button type="submit" class="primary-btn" id="loginSubmitBtn">Giriş Yap</button>
-    </form>
-
-    <!-- HESAP OLUŞTUR FORMU -->
-    <form id="registerForm" class="auth-form hidden">
-      <label for="registerUsername">Kullanıcı adı</label>
-      <input type="text" id="registerUsername" autocomplete="username" required />
-
-      <label for="registerPassword">Şifre</label>
-      <input type="password" id="registerPassword" autocomplete="new-password" required />
-
-      <label for="registerPasswordConfirm">Şifre (tekrar)</label>
-      <input type="password" id="registerPasswordConfirm" autocomplete="new-password" required />
-
-      <button type="submit" class="primary-btn" id="registerSubmitBtn">Hesap Oluştur</button>
-    </form>
+    <nav class="pagination" id="pagination" aria-label="Sayfalar"></nav>
   </main>
 
-  <script type="module" src="auth.js"></script>
+  <script type="module" src="feed.js"></script>
 </body>
 </html>

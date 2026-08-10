@@ -22,11 +22,11 @@ function showStatus(message, type = "error") {
   statusMsg.classList.toggle("success", type === "success");
 }
 
-// Giriş kontrolü
+// Giriş kontrolü — girişi yoksa, geri dönmesi için bilgilendirerek giriş sayfasına gönder
 (async function requireAuth() {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) {
-    window.location.href = "index.html";
+    window.location.href = "giris.html?redirect=paylas.html";
   }
 })();
 
@@ -44,7 +44,7 @@ form.addEventListener("submit", async (e) => {
 
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) {
-    window.location.href = "index.html";
+    window.location.href = "giris.html?redirect=paylas.html";
     return;
   }
 
@@ -93,6 +93,6 @@ form.addEventListener("submit", async (e) => {
   form.reset();
   previewImg.classList.add("hidden");
   setTimeout(() => {
-    window.location.href = "duzenler.html";
+    window.location.href = "index.html";
   }, 800);
 });

@@ -41,6 +41,17 @@
     <nav class="pagination" id="pagination" aria-label="Sayfalar"></nav>
   </main>
 
+  <!-- Giriş gerektiren bir işlem denendiğinde çıkan bilgilendirme penceresi -->
+  <div class="modal-overlay hidden" id="authModal">
+    <div class="modal-box">
+      <p id="authModalText">Bu işlem için giriş yapman gerekiyor.</p>
+      <div class="modal-actions">
+        <button type="button" class="primary-btn" id="authModalLogin">Oturum Aç</button>
+        <button type="button" class="btn-logout" id="authModalCancel">Oturum açmadan devam et</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="feed.js"></script>
 </body>
 </html>

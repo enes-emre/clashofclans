@@ -20,6 +20,11 @@ const tabTh17 = document.getElementById("tabTh17");
 const tabSaved = document.getElementById("tabSaved");
 const allTabs = [tabAll, tabTh18, tabTh17, tabSaved];
 
+const authModal = document.getElementById("authModal");
+const authModalText = document.getElementById("authModalText");
+const authModalLogin = document.getElementById("authModalLogin");
+const authModalCancel = document.getElementById("authModalCancel");
+
 // ------------------------------------------------------------
 // Giriş durumunu oku — YÖNLENDİRME YOK, sadece arayüzü ayarlıyoruz.
 // Site herkese açık; giriş sadece paylaşma/puanlama/kaydetme için gerekir.
@@ -39,10 +44,20 @@ async function loadSession() {
   }
 }
 
-// Giriş isteyen bir eyleme tıklanınca çağrılır
-function goToLogin() {
-  window.location.href = "giris.html";
+// Giriş isteyen bir eyleme tıklanınca çağrılır — artık doğrudan yönlendirmiyor,
+// önce bilgilendirme + seçim penceresi açıyor.
+function requireLoginFor(message) {
+  authModalText.textContent = message;
+  authModal.classList.remove("hidden");
 }
+
+authModalLogin.addEventListener("click", () => {
+  window.location.href = "giris.html";
+});
+
+authModalCancel.addEventListener("click", () => {
+  authModal.classList.add("hidden");
+});
 
 // ------------------------------------------------------------
 // Düzenleri getir ve çiz
@@ -51,9 +66,9 @@ async function loadBases() {
   grid.innerHTML = `<p class="grid-status">Yükleniyor...</p>`;
   paginationEl.innerHTML = "";
 
-  // Kaydedilenler sekmesi giriş ister
+  // Kaydedilenler sekmesi giriş ister — normalde setView bunu daha erken yakalar,
+  // burası ek bir güvenlik katmanı.
   if (currentView === "saved" && !currentSession) {
-    goToLogin();
     return;
   }
 
@@ -206,7 +221,7 @@ function escapeHtml(str) {
 // ------------------------------------------------------------
 async function submitRating(baseId, value) {
   if (!currentSession) {
-    goToLogin();
+    requireLoginFor("Puan verebilmek için giriş yapman gerekiyor.");
     return;
   }
   await supabase.from("ratings").upsert(
@@ -221,7 +236,7 @@ async function submitRating(baseId, value) {
 // ------------------------------------------------------------
 async function toggleSave(baseId, btn) {
   if (!currentSession) {
-    goToLogin();
+    requireLoginFor("Düzen kaydedebilmek için giriş yapman gerekiyor.");
     return;
   }
 
@@ -291,7 +306,7 @@ function goToPage(page) {
 // ------------------------------------------------------------
 function setView(view, activeTab) {
   if (view === "saved" && !currentSession) {
-    goToLogin();
+    requireLoginFor("Kaydedilenleri görmek için giriş yapman gerekiyor.");
     return;
   }
   if (currentView === view) return;

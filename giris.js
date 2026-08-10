@@ -4,8 +4,10 @@ import { supabase, usernameToFakeEmail, REMEMBER_FLAG_KEY } from "./supabaseClie
 const params = new URLSearchParams(window.location.search);
 const redirectTarget = params.get("redirect") || "index.html";
 
-if (params.get("redirect") === "paylas.html") {
-  document.getElementById("redirectNotice").classList.remove("hidden");
+// Not: element bulunamazsa (örn. eski bir dosya sürümü) sayfa çökmesin diye kontrol ediyoruz
+const redirectNotice = document.getElementById("redirectNotice");
+if (redirectNotice && params.get("redirect") === "paylas.html") {
+  redirectNotice.classList.remove("hidden");
 }
 
 // ------------------------------------------------------------

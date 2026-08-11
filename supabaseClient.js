@@ -5,8 +5,8 @@
 // ============================================================
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const SUPABASE_URL = "https://kdxtvayswxsmvfnfgxwr.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkeHR2YXlzd3hzbXZmbmZneHdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwNDE4NjEsImV4cCI6MjEwMTYxNzg2MX0.i0RAknolBzHtwUHpAvlXQXm1EjDcsCybcHe3NUiQvfY";
+const SUPABASE_URL = "https://nknfcvlohpnviaeskhqm.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5rbmZjdmxvaHBudmlhZXNraHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0NTY1MTMsImV4cCI6MjEwMjAzMjUxM30.SlSwjsaydeSb-O4N_ST1a3cbcZACBRvi3BFGT911OH4";
 
 // "Beni hatırla" mantığı: işaretliyse localStorage (kalıcı),
 // değilse sessionStorage (sekme kapanınca silinir).

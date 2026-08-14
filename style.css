@@ -332,6 +332,68 @@ a:focus-visible {
   color: var(--accent);
 }
 
+/* ---------- Filtreleme paneli ---------- */
+.filter-panel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  align-items: end;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 20px;
+}
+
+.filter-panel.hidden {
+  display: none;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.filter-group select,
+.filter-group input {
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+}
+
+.filter-group select:focus,
+.filter-group input:focus {
+  border-color: var(--accent);
+}
+
+.filter-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+}
+
+.filter-actions .primary-btn {
+  margin-top: 0;
+  flex: 1;
+}
+
+.filter-actions .btn-logout {
+  flex: 1;
+  text-align: center;
+}
+
 /* ---------- Grid: 2 sütun x 5 satır ---------- */
 .feed-main {
   max-width: 920px;
@@ -655,21 +717,21 @@ a:focus-visible {
   width: 100%;
 }
 
-/* ---------- Belediye binası seçimi (paylaşım formu) ---------- */
+/* ---------- Belediye binası / düzen türü seçimi (paylaşım formu) ---------- */
 .th-select {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   margin-top: 4px;
 }
 
 .th-btn {
-  flex: 1;
-  padding: 10px 0;
+  padding: 10px 4px;
   border: 1px solid var(--border);
   background: var(--bg);
   color: var(--text-muted);
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
@@ -742,6 +804,15 @@ a:focus-visible {
     padding: 9px 6px;
     font-size: 12.5px;
     text-align: center;
+  }
+
+  .filter-panel {
+    grid-template-columns: 1fr;
+    padding: 14px;
+  }
+
+  .filter-actions {
+    flex-direction: column;
   }
 
   /* Kartlar tek sütuna düşer */

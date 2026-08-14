@@ -3,27 +3,39 @@ import { supabase } from "./supabaseClient.js";
 const PAGE_SIZE = 10; // 5 satır x 2 sütun
 
 let currentPage = 1;
-let currentSearch = "";
-let currentView = "all"; // "all" | "saved" | "th17" | "th18"
+let currentView = "all"; // "all" | "saved"
 let currentSession = null; // giriş yapılmamışsa null kalır — gezinme buna izin verir
+
+// Uygulanan filtreler ("Uygula" tuşuna basınca güncellenir)
+let filters = { townHall: "", baseType: "", username: "" };
 
 const grid = document.getElementById("basesGrid");
 const paginationEl = document.getElementById("pagination");
-const searchForm = document.getElementById("searchForm");
-const searchInput = document.getElementById("searchInput");
 const logoutBtn = document.getElementById("logoutBtn");
 const shareBtn = document.getElementById("shareBtn");
 const loginBtn = document.getElementById("loginBtn");
 const tabAll = document.getElementById("tabAll");
-const tabTh18 = document.getElementById("tabTh18");
-const tabTh17 = document.getElementById("tabTh17");
 const tabSaved = document.getElementById("tabSaved");
-const allTabs = [tabAll, tabTh18, tabTh17, tabSaved];
+const tabFilter = document.getElementById("tabFilter");
+const viewTabs = [tabAll, tabSaved]; // "Filtrele" bir görünüm değil, panel açma/kapama tuşu
+
+const filterPanel = document.getElementById("filterPanel");
+const filterTownHall = document.getElementById("filterTownHall");
+const filterBaseType = document.getElementById("filterBaseType");
+const filterUsername = document.getElementById("filterUsername");
+const filterApply = document.getElementById("filterApply");
+const filterClear = document.getElementById("filterClear");
 
 const authModal = document.getElementById("authModal");
 const authModalText = document.getElementById("authModalText");
 const authModalLogin = document.getElementById("authModalLogin");
 const authModalCancel = document.getElementById("authModalCancel");
+
+const BASE_TYPE_LABELS = {
+  war_base: "War",
+  trophy_base: "Trophy",
+  for_fun: "Fun",
+};
 
 // ------------------------------------------------------------
 // Giriş durumunu oku — YÖNLENDİRME YOK, sadece arayüzü ayarlıyoruz.
@@ -44,7 +56,7 @@ async function loadSession() {
   }
 }
 
-// Giriş isteyen bir eyleme tıklanınca çağrılır — artık doğrudan yönlendirmiyor,
+// Giriş isteyen bir eyleme tıklanınca çağrılır — doğrudan yönlendirmiyor,
 // önce bilgilendirme + seçim penceresi açıyor.
 function requireLoginFor(message) {
   authModalText.textContent = message;
@@ -66,8 +78,6 @@ async function loadBases() {
   grid.innerHTML = `<p class="grid-status">Yükleniyor...</p>`;
   paginationEl.innerHTML = "";
 
-  // Kaydedilenler sekmesi giriş ister — normalde setView bunu daha erken yakalar,
-  // burası ek bir güvenlik katmanı.
   if (currentView === "saved" && !currentSession) {
     return;
   }
@@ -92,18 +102,21 @@ async function loadBases() {
 
   let query = supabase
     .from("bases")
-    .select("id, image_url, link, town_hall, created_at, profiles!inner(id, username)", { count: "exact" })
+    .select("id, image_url, link, town_hall, base_type, created_at, profiles!inner(id, username)", {
+      count: "exact",
+    })
     .order("created_at", { ascending: false })
     .range(from, to);
 
-  if (currentSearch) {
-    query = query.ilike("profiles.username", `%${currentSearch}%`);
+  if (filters.username) {
+    query = query.ilike("profiles.username", `%${filters.username}%`);
   }
-
-  if (currentView === "th17" || currentView === "th18") {
-    query = query.eq("town_hall", currentView === "th17" ? 17 : 18);
+  if (filters.townHall) {
+    query = query.eq("town_hall", Number(filters.townHall));
   }
-
+  if (filters.baseType) {
+    query = query.eq("base_type", filters.baseType);
+  }
   if (savedBaseIds) {
     query = query.in("id", savedBaseIds);
   }
@@ -144,7 +157,6 @@ async function loadBases() {
   renderPagination(count || 0);
 }
 
-// Giriş yoksa boş döner — anonim ziyaretçi için puan/kayıt bilgisi olmaz
 async function getMyRatings(baseIds) {
   if (!currentSession) return {};
   const { data } = await supabase
@@ -173,11 +185,12 @@ function renderCard(base, avgRating, baseCount, myRating, isSaved) {
   card.className = "base-card";
 
   const ratingText = avgRating ? Number(avgRating).toFixed(1) : "—";
+  const typeLabel = BASE_TYPE_LABELS[base.base_type] || base.base_type;
 
   card.innerHTML = `
     <div class="base-image-wrap">
       <img src="${base.image_url}" alt="${escapeHtml(base.profiles.username)} kullanıcısının düzeni" loading="lazy" />
-      <span class="th-badge">TH${base.town_hall}</span>
+      <span class="th-badge">TH${base.town_hall} · ${typeLabel}</span>
       <span class="rating-badge">⭐ ${ratingText}</span>
     </div>
     <a class="base-link" href="${base.link}" target="_blank" rel="noopener noreferrer">Düzeni Aç ↗</a>
@@ -302,7 +315,7 @@ function goToPage(page) {
 }
 
 // ------------------------------------------------------------
-// Görünüm sekmeleri (Tüm Düzenler / TH18 / TH17 / Kaydedilenler)
+// Görünüm sekmeleri (Tüm Düzenler / Kaydedilenler)
 // ------------------------------------------------------------
 function setView(view, activeTab) {
   if (view === "saved" && !currentSession) {
@@ -312,22 +325,45 @@ function setView(view, activeTab) {
   if (currentView === view) return;
   currentView = view;
   currentPage = 1;
-  allTabs.forEach((t) => t.classList.remove("active"));
+  viewTabs.forEach((t) => t.classList.remove("active"));
   activeTab.classList.add("active");
   loadBases();
 }
 
 tabAll.addEventListener("click", () => setView("all", tabAll));
-tabTh18.addEventListener("click", () => setView("th18", tabTh18));
-tabTh17.addEventListener("click", () => setView("th17", tabTh17));
 tabSaved.addEventListener("click", () => setView("saved", tabSaved));
 
 // ------------------------------------------------------------
-// Arama — giriş gerektirmez
+// Filtreleme paneli — bir görünüm değil, açılır/kapanır panel
 // ------------------------------------------------------------
-searchForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  currentSearch = searchInput.value.trim();
+tabFilter.addEventListener("click", () => {
+  const isOpen = !filterPanel.classList.contains("hidden");
+  filterPanel.classList.toggle("hidden", isOpen);
+  tabFilter.classList.toggle("active", !isOpen);
+});
+
+filterApply.addEventListener("click", () => {
+  filters = {
+    townHall: filterTownHall.value,
+    baseType: filterBaseType.value,
+    username: filterUsername.value.trim(),
+  };
+  currentPage = 1;
+  loadBases();
+});
+
+filterUsername.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    filterApply.click();
+  }
+});
+
+filterClear.addEventListener("click", () => {
+  filterTownHall.value = "";
+  filterBaseType.value = "";
+  filterUsername.value = "";
+  filters = { townHall: "", baseType: "", username: "" };
   currentPage = 1;
   loadBases();
 });

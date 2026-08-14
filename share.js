@@ -5,15 +5,25 @@ const statusMsg = document.getElementById("statusMsg");
 const submitBtn = document.getElementById("shareSubmitBtn");
 const fileInput = document.getElementById("baseImage");
 const previewImg = document.getElementById("imagePreview");
-const thButtons = document.querySelectorAll(".th-btn");
+const thButtons = document.querySelectorAll("#thSelect .th-btn");
+const typeButtons = document.querySelectorAll("#typeSelect .th-btn");
 
 let selectedTownHall = 17;
+let selectedBaseType = "war_base";
 
 thButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     thButtons.forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
     selectedTownHall = Number(btn.dataset.th);
+  });
+});
+
+typeButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    typeButtons.forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    selectedBaseType = btn.dataset.type;
   });
 });
 
@@ -79,6 +89,7 @@ form.addEventListener("submit", async (e) => {
     image_url: publicUrlData.publicUrl,
     link,
     town_hall: selectedTownHall,
+    base_type: selectedBaseType,
   });
 
   submitBtn.disabled = false;

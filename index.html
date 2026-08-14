@@ -12,12 +12,7 @@
 <body class="feed-body">
 
   <header class="site-nav">
-    <div class="brand">Made in Turkey</div>
-
-    <form class="search-form" id="searchForm">
-      <input type="text" id="searchInput" placeholder="Kullanıcı adına göre ara..." />
-      <button type="submit" aria-label="Ara">Ara</button>
-    </form>
+    <a href="index.html" class="brand">Made in Turkey</a>
 
     <div class="nav-actions">
       <a href="paylas.html" class="btn-share hidden" id="shareBtn">+ Düzen Paylaş</a>
@@ -29,9 +24,43 @@
   <main class="feed-main">
     <div class="view-tabs">
       <button type="button" class="view-tab active" id="tabAll">Tüm Düzenler</button>
-      <button type="button" class="view-tab" id="tabTh18" data-th="18">TH18</button>
-      <button type="button" class="view-tab" id="tabTh17" data-th="17">TH17</button>
       <button type="button" class="view-tab" id="tabSaved">Kaydedilenler</button>
+      <button type="button" class="view-tab" id="tabFilter">Filtrele</button>
+    </div>
+
+    <div class="filter-panel hidden" id="filterPanel">
+      <div class="filter-group">
+        <label for="filterTownHall">Belediye binası</label>
+        <select id="filterTownHall">
+          <option value="">Tümü</option>
+          <option value="18">TH18</option>
+          <option value="17">TH17</option>
+          <option value="16">TH16</option>
+          <option value="15">TH15</option>
+          <option value="14">TH14</option>
+          <option value="13">TH13</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filterBaseType">Düzen türü</label>
+        <select id="filterBaseType">
+          <option value="">Tümü</option>
+          <option value="war_base">War Base</option>
+          <option value="trophy_base">Trophy Base</option>
+          <option value="for_fun">For Fun</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filterUsername">Kullanıcı adı</label>
+        <input type="text" id="filterUsername" placeholder="Kullanıcı adına göre ara..." />
+      </div>
+
+      <div class="filter-actions">
+        <button type="button" class="primary-btn" id="filterApply">Uygula</button>
+        <button type="button" class="btn-logout" id="filterClear">Temizle</button>
+      </div>
     </div>
 
     <section class="grid" id="basesGrid">

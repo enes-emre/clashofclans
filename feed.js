@@ -14,6 +14,7 @@ const paginationEl = document.getElementById("pagination");
 const logoutBtn = document.getElementById("logoutBtn");
 const shareBtn = document.getElementById("shareBtn");
 const loginBtn = document.getElementById("loginBtn");
+const adminLink = document.getElementById("adminLink");
 const tabAll = document.getElementById("tabAll");
 const tabSaved = document.getElementById("tabSaved");
 const tabFilter = document.getElementById("tabFilter");
@@ -49,10 +50,19 @@ async function loadSession() {
     shareBtn.classList.remove("hidden");
     logoutBtn.classList.remove("hidden");
     loginBtn.classList.add("hidden");
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("is_admin")
+      .eq("id", session.user.id)
+      .single();
+
+    adminLink.classList.toggle("hidden", !(profile && profile.is_admin));
   } else {
     shareBtn.classList.add("hidden");
     logoutBtn.classList.add("hidden");
     loginBtn.classList.remove("hidden");
+    adminLink.classList.add("hidden");
   }
 }
 

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yönetici Paneli</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="feed-body">
+
+  <header class="site-nav">
+    <a href="index.html" class="brand">Made in Turkey</a>
+    <div class="nav-actions">
+      <a href="index.html" class="btn-logout">← Ana sayfaya dön</a>
+    </div>
+  </header>
+
+  <main class="feed-main">
+    <h1 class="auth-title admin-title">Yönetici Paneli</h1>
+    <p id="adminStatus" class="grid-status"></p>
+
+    <div class="admin-table-wrap hidden" id="adminTableWrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Görsel</th>
+            <th>Kullanıcı</th>
+            <th>Belediye binası</th>
+            <th>Düzen türü</th>
+            <th>Link</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="adminTableBody"></tbody>
+      </table>
+    </div>
+
+    <nav class="pagination" id="adminPagination" aria-label="Sayfalar"></nav>
+  </main>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
